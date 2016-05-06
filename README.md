@@ -1,6 +1,6 @@
-Source code to compute spherically expanding and converging shock waves through isotropic turbulence and perturbed material interfaces. 
+Source code to compute spherically expanding and converging shock waves through isotropic turbulence and perturbed material interfaces. It is a massively parallel code with proven weak scaling up to 32,000 cores.   
 
-This work was done by me as part of my Ph.D. at Stanford University. 
+Developed by me as part of my Ph.D. at Stanford University. 
 
 <h2>Reference</h2>
 A. Bhagatwala, <a href="https://books.google.com/books?id=RlBwQjTJkCMC&lpg=PR8&ots=qGd_JxnhgO&dq=info%3Aiea_iK9OsZgJ%3Ascholar.google.com&lr&pg=PR1#v=onepage&q&f=false"> Shock-turbulence Interaction and Richtmyer-Meshkov Instability in Spherical Geometry</a>, 2011, Stanford University
