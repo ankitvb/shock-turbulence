@@ -1,0 +1,8 @@
+#PBS -q regular 
+#PBS -l mppwidth=4096
+#PBS -l mppnppn=4
+#PBS -l walltime=00:10:00
+#PBS -j eo
+
+cd $PBS_O_WORKDIR
+aprun -n 4096 -N 4 ./genfield.out

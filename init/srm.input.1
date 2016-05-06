@@ -1,0 +1,49 @@
+Input/Output path and filename:
+Visual               vis_path (Path name for visualization files)
+Restart              restart_path (Path name for restart files)
+Stats                stats_path (Path name for statistics files)
+Probe                probe_path (Path name for probe measurements)
+Source               source_path (Path name for noise source data)
+srm                  prefix (Prefix for output files)
+
+Grid parameters:
+1                    Grid_X (Spec for x-grid, 1:uniform; 2:stretch)
+1                    Grid_Y (Spec for y-grid, 1:uniform; 2:erf)
+0d0                  x_start (Start point in x-direction)
+0d0                  y_start (Start point in y-direction)
+0d0                  z_start (Start point in z-direction)
+1.5d0                period_x (Domain length in x-direction)
+1.5d0                period_y (Domain length in y-direction)
+1.5d0                period_z (Domain length in z-direction)
+
+Flow parameters:
+0d0                  Re (Reynolds number: inertial to viscous forces)
+0d0                  Pr (Prandtl number)
+1d0                  Sc (Schmidt number)
+1.4d0                gamma1 (Specific heat ratio of gas 1)
+1.09d0               gamma2 (Specific heat ratio of gas 2)
+0.198265856d0        epsilon (Ratio of molecular weights = M1/M2)
+0.76d0               vis_exp (Exponent of viscosity power law)
+0.0d0                bulk_ratio (Bulk to shear viscosity ratio)
+1d0                  T_ratio (Temperature ratio)
+1                    hyper_param (0: hyperviscosity off, 1: on)
+
+Time advancement parameters:
+1                    march_mode (1,2:Nsteps; 3,4:time; 1,3:CFL; 2,4:dt)
+0.125d-1             Tstep (Time step)
+0.1d0                cfl_cal (CFL in computation)
+20                   Nsteps (# of time steps to take)
+4200d0               run_time (Computation time in wall seconds)
+1                    comp_stats (# of time step to accumulate stats)
+
+Input/Output parameters:
+1                    out_grid (Write the grid, 1:write)
+1                    out_init (Write the initial field, 1:write)
+1                    out_incr_x (Output increment in x-grid)
+1                    out_incr_y (Output increment in y-grid)
+1                    out_incr_z (Output increment in z-grid)
+1000                out_restart (# of time step to write restart file)
+500                 out_vis (# of time step to write visual results)
+1000                out_probe (# of time step to write probe data)
+1000                out_stats (# of time step to write turb stats)
+1000                out_source (# of time step to write noise source)

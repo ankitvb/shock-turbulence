@@ -1,0 +1,15 @@
+      integer, parameter :: part_unit = 22, NpDof = 8 
+      integer :: NpMax, Npart
+      integer, dimension(0:Px*Py*Pz-1) :: Np
+      integer, dimension(0:Px*Py*Pz-1) :: Nxli, Nxlo, Nxri, Nxro
+      integer, dimension(0:Px*Py*Pz-1) :: Nyli, Nylo, Nyri, Nyro
+      integer, dimension(0:Px*Py*Pz-1) :: Nzli, Nzlo, Nzri, Nzro
+
+! particle array is of rank (Np,NpDof) and NpDofs are x, y, z, rho, P, om2, dil, tag
+      real*8, dimension(:,:), pointer :: part, dpart, partW
+
+      Common /PARTICLES/ Np, Nxli, Nxlo, Nxri, Nxro,
+     .                   Nyli, Nylo, Nyri, Nyro, 
+     .                   Nzli, Nzlo, Nzri, Nzro,
+     .                   NpMax, Npart, part, dpart, partW
+

@@ -1,0 +1,1 @@
+qsub -A Turbulent_Mixing -t 20 -n 128 --mode vn -q prod-devel genfield.out

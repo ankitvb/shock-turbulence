@@ -1,0 +1,106 @@
+F77COMP     = mpixlf77
+F90COMP     = mpixlf90
+CCOMP       = mpicc
+LIB_LIST    =  
+NICE        =
+#OPTS        = -qarch=450 -g -qflttrap=invalid:nanq:zerodivide 
+OPTS        = -O5
+ARCH        = 
+
+OBJECTS     =  main.o initialize_mpi_nonperiodic1d.o \
+	           define_nonperiodic1d_sf.o grid.o \
+			   derivCDopt6_nonperiodic1d.o filters_nonperiodic1d.o \
+               pproc_sv.o  bc_sv.o sponge1d.o\
+               out.o grad.o lddrk4_nonperiodic_sf.o \
+			   rhsv_nonperiodic_sf.o stats.o debug_nonperiodic1d_sf.o\
+               openfile.o version.o cvers.o ctof.o auxiliary.o \
+               hyper_routines.o hyper_rhs.o  tridiagonal.o \
+               pentadiagonal.o polydiagonal.o
+
+cell_de_np1d: $(OBJECTS)
+	$(F77COMP) -o cell_de_np1d $(ARCH) $(OBJECTS) $(LIB_LIST) 
+
+main.o:  header main.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) main.f
+
+auxiliary.o: header auxiliary.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) auxiliary.f
+ 
+bc1d.o: header bc1d.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) bc1d.f
+
+bc_sv.o: header bc_sv.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) bc_sv.f
+
+debug_nonperiodic1d_sf.o: header debug_nonperiodic1d_sf.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) debug_nonperiodic1d_sf.f
+
+define_nonperiodic1d_sf.o:  header define_nonperiodic1d_sf.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) define_nonperiodic1d_sf.f
+
+filters_nonperiodic1d.o: header LES_header filters_nonperiodic1d.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) filters_nonperiodic1d.f
+
+grid.o:  header grid.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) grid.f
+
+derivCDopt6_nonperiodic1d.o:  header derivCDopt6_nonperiodic1d.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) derivCDopt6_nonperiodic1d.f
+
+initialize_mpi_nonperiodic1d.o: header initialize_mpi_nonperiodic1d.f90
+	$(F90COMP) -c $(ARCH) $(NICE) $(OPTS) initialize_mpi_nonperiodic1d.f90
+
+pentadiagonal.o: pentadiagonal.f90
+	$(F90COMP) -c $(ARCH) $(NICE) $(OPTS) pentadiagonal.f90
+
+polydiagonal.o: polydiagonal.f90
+	$(F90COMP) -c $(ARCH) $(NICE) $(OPTS) polydiagonal.f90
+
+tridiagonal.o: tridiagonal.f90
+	$(F90COMP) -c $(ARCH) $(NICE) $(OPTS) tridiagonal.f90
+
+stats.o:  header stats.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) stats.f
+
+out.o:  header out.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) out.f
+
+pproc_sv.o: header pproc_sv.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) pproc_sv.f
+
+grad.o:  header grad.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) grad.f
+
+hyper_dynamic.o: header LES_header hyper_dynamic.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) hyper_dynamic.f
+
+hyper_routines.o: header LES_header hyper_routines.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) hyper_routines.f
+
+hyper_rhs.o: header hyper_rhs.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) hyper_rhs.f
+
+lddrk4_nonperiodic_sf.o:  header lddrk4_nonperiodic_sf.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) lddrk4_nonperiodic_sf.f
+
+rhsv_nonperiodic_sf.o:  header rhsv_nonperiodic_sf.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) rhsv_nonperiodic_sf.f
+
+sponge1d.o: header sponge1d.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) sponge1d.f
+
+openfile.o:  openfile.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) openfile.f
+
+version.o:  version.h version.c
+	$(CCOMP) -c $(ARCH) version.c
+
+cvers.o:  ctof.h version.h cvers.c
+	$(CCOMP) -c $(ARCH) cvers.c
+
+ctof.o:  ctof.h ctof.c
+	$(CCOMP) -c $(ARCH) ctof.c
+
+#  remove object files
+clean:
+	rm -f *.o

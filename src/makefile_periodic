@@ -1,0 +1,107 @@
+F77COMP     = mpixlf77
+F90COMP     = mpixlf90
+CCOMP       = mpicc
+LIB_LIST    = -L/home/ankitb/local/silo/lib -lsilo -lm
+NICE        =
+#OPTS        = -qarch=450 -g -qflttrap=invalid:nanq:zerodivide  
+OPTS        = -O2
+ARCH        =  
+INCLUDE     = -I/home/ankitb/local/silo/include
+
+OBJECTS1     = main.o initialize_mpi_periodic.o \
+               define_periodic_sf.o grid.o \
+			   derivCDopt6_periodic.o filters_periodic.o\
+               lddrk4_periodic_sf.o rhsv_periodic_sf.o\
+               out.o grad.o openfile.o version.o cvers.o ctof.o\
+               auxiliary.o hyper_dynamic.o hyper_rhs.o \
+               tridiagonal.o pentadiagonal.o polydiagonal.o\
+               shock.o vis_silo.o dirs.o particles.o \
+               pproc_shockturb.o
+
+cell_de_p: $(OBJECTS1)
+	$(F77COMP) -o cell_de_p $(ARCH) $(OBJECTS1) $(LIB_LIST) 
+
+main.o:  header part_header main.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) main.f
+
+auxiliary.o: header auxiliary.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) auxiliary.f
+
+define_periodic_sf.o:  header define_periodic_sf.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) define_periodic_sf.f
+
+filters_periodic.o: header LES_header filters_periodic.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) filters_periodic.f
+
+grid.o:  header grid.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) grid.f
+
+derivCDopt6_periodic.o:  header derivCDopt6_periodic.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) derivCDopt6_periodic.f
+
+initialize_mpi_periodic.o: header initialize_mpi_periodic.f90
+	$(F90COMP) -c $(ARCH) $(NICE) $(OPTS) initialize_mpi_periodic.f90
+
+pentadiagonal.o: pentadiagonal.f90
+	$(F90COMP) -c $(ARCH) $(NICE) $(OPTS) pentadiagonal.f90
+
+polydiagonal.o: polydiagonal.f90
+	$(F90COMP) -c $(ARCH) $(NICE) $(OPTS) polydiagonal.f90
+
+tridiagonal.o: tridiagonal.f90
+	$(F90COMP) -c $(ARCH) $(NICE) $(OPTS) tridiagonal.f90
+
+out.o:  header part_header out.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) out.f
+
+grad.o:  header grad.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) grad.f
+
+hyper_dynamic.o: header LES_header hyper_dynamic.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) hyper_dynamic.f
+
+hyper_routines.o: header LES_header hyper_routines.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) hyper_routines.f
+
+hyper_rhs.o: header hyper_rhs.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) hyper_rhs.f
+
+lddrk4_periodic_sf.o:  header part_header lddrk4_periodic_sf.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) lddrk4_periodic_sf.f
+
+particles.o: header part_header particles.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) particles.f
+
+pproc_shockturb.o: header pproc_shockturb.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) pproc_shockturb.f
+
+rhsv_periodic_sf.o:  header rhsv_periodic_sf.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) rhsv_periodic_sf.f
+
+rhsv_test.o:  header rhsv_test.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) rhsv_test.f
+
+shock.o: header shock.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) shock.f
+
+openfile.o:  openfile.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) openfile.f
+
+vis_silo.o: header part_header vis_silo.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) $(INCLUDE) vis_silo.f
+
+version.o:  version.h version.c
+	$(CCOMP) -c $(ARCH) version.c
+
+cvers.o:  ctof.h version.h cvers.c
+	$(CCOMP) -c $(ARCH) cvers.c
+
+ctof.o:  ctof.h ctof.c
+	$(CCOMP) -c $(ARCH) ctof.c
+
+dirs.o: dirs.h dirs.c
+	$(CCOMP) -c $(ARCH) dirs.c
+
+#  remove object files
+clean:
+	rm -f *.o

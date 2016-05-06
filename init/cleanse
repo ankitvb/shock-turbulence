@@ -1,0 +1,6 @@
+rm *.grid.*
+rm ./*.script.*
+rm *_trace
+rm srm.restart.0
+rm init.pbs.e*
+make

@@ -1,0 +1,158 @@
+*
+*  Filters (high-wavenumber & test) for symmetry boundaries
+*
+      Real*8  ldu_filt_x_sym_A(LotX,Mx), ldu_filt_y_sym_A(LotY,My),
+     .        ldu_filt_z_sym_A(LotZ,Mz)
+      Real*8  ldu_filt_x_sym_B(LotX,Mx), ldu_filt_y_sym_B(LotY,My),
+     .        ldu_filt_z_sym_B(LotZ,Mz)
+      Real*8  ldu_filt_x_sym_C(LotX,Mx), ldu_filt_y_sym_C(LotY,My),
+     .        ldu_filt_z_sym_C(LotZ,Mz)
+      Real*8  ldu_filt_x_sym_D(LotX,Mx), ldu_filt_y_sym_D(LotY,My),
+     .        ldu_filt_z_sym_D(LotZ,Mz)
+      Real*8  ldu_filt_x_sym_E(LotX,Mx), ldu_filt_y_sym_E(LotY,My),
+     .        ldu_filt_z_sym_E(LotZ,Mz)
+      Real*8  ldu_filt_x_asym_A(LotX,Mx), ldu_filt_y_asym_A(LotY,My),
+     .        ldu_filt_z_asym_A(LotZ,Mz)
+      Real*8  ldu_filt_x_asym_B(LotX,Mx), ldu_filt_y_asym_B(LotY,My),
+     .        ldu_filt_z_asym_B(LotZ,Mz)
+      Real*8  ldu_filt_x_asym_C(LotX,Mx), ldu_filt_y_asym_C(LotY,My),
+     .        ldu_filt_z_asym_C(LotZ,Mz)
+      Real*8  ldu_filt_x_asym_D(LotX,Mx), ldu_filt_y_asym_D(LotY,My),
+     .        ldu_filt_z_asym_D(LotZ,Mz)
+      Real*8  ldu_filt_x_asym_E(LotX,Mx), ldu_filt_y_asym_E(LotY,My),
+     .        ldu_filt_z_asym_E(LotZ,Mz)
+
+      Common  /FILT/ ldu_filt_x_sym_A, ldu_filt_y_sym_A,
+     .               ldu_filt_z_sym_A,
+     .               ldu_filt_x_sym_B, ldu_filt_y_sym_B,
+     .               ldu_filt_z_sym_B,
+     .               ldu_filt_x_sym_C, ldu_filt_y_sym_C,
+     .               ldu_filt_z_sym_C,
+     .               ldu_filt_x_sym_D, ldu_filt_y_sym_D,
+     .               ldu_filt_z_sym_D,
+     .               ldu_filt_x_sym_E, ldu_filt_y_sym_E,
+     .               ldu_filt_z_sym_E,
+     .               ldu_filt_x_asym_A, ldu_filt_y_asym_A,
+     .               ldu_filt_z_asym_A,
+     .               ldu_filt_x_asym_B, ldu_filt_y_asym_B,
+     .               ldu_filt_z_asym_B,
+     .               ldu_filt_x_asym_C, ldu_filt_y_asym_C,
+     .               ldu_filt_z_asym_C,
+     .               ldu_filt_x_asym_D, ldu_filt_y_asym_D,
+     .               ldu_filt_z_asym_D,
+     .               ldu_filt_x_asym_E, ldu_filt_y_asym_E,
+     .               ldu_filt_z_asym_E
+
+*
+*  Filters (high-wavenumber & test) for regular nonperiodic boundaries
+*
+      Real*8  ldu_filt_x_A(LotX,Mx), ldu_filt_y_A(LotY,My),
+     .        ldu_filt_z_A(LotZ,Mz)
+      Real*8  ldu_filt_x_B(LotX,Mx), ldu_filt_y_B(LotY,My),
+     .        ldu_filt_z_B(LotZ,Mz)
+      Real*8  ldu_filt_x_C(LotX,Mx), ldu_filt_y_C(LotY,My),
+     .        ldu_filt_z_C(LotZ,Mz)
+      Real*8  ldu_filt_x_D(LotX,Mx), ldu_filt_y_D(LotY,My),
+     .        ldu_filt_z_D(LotZ,Mz)
+      Real*8  ldu_filt_x_E(LotX,Mx), ldu_filt_y_E(LotY,My),
+     .        ldu_filt_z_E(LotZ,Mz)
+
+      Common  /FILT/ ldu_filt_x_A, ldu_filt_y_A, ldu_filt_z_A,
+     .               ldu_filt_x_B, ldu_filt_y_B, ldu_filt_z_B,
+     .               ldu_filt_x_C, ldu_filt_y_C, ldu_filt_z_C,
+     .               ldu_filt_x_D, ldu_filt_y_D, ldu_filt_z_D,
+     .               ldu_filt_x_E, ldu_filt_y_E, ldu_filt_z_E
+
+      Real*8   bndy_alpha_filt, alpha_filt4, beta_filt4
+      Real*8   a0_filt4, a1_filt4, a2_filt4, a3_filt4
+      Real*8   a4_filt4
+      Real*8   bndy_a1_closure1_filt, bndy_a2_closure1_filt,
+     .         bndy_a3_closure1_filt, bndy_a4_closure1_filt,
+     .         bndy_a5_closure1_filt
+      Real*8   bndy_a0_closure2_filt, bndy_a1_closure2_filt,
+     .         bndy_a2_closure2_filt, bndy_a3_closure2_filt,
+     .         bndy_a4_closure2_filt, bndy_a5_closure2_filt
+      Real*8   bndy_a0_closure3_filt, bndy_a1_closure3_filt
+      Real*8   bndy_a2_closure3_filt
+      Real*8   bndy_a0_closure4_filt, bndy_a1_closure4_filt
+      Real*8   bndy_a2_closure4_filt, bndy_a3_closure4_filt
+
+*
+* Fourth order optimized filter (Ankit)
+*
+c      Parameter (alpha_filt4 = 6.58972630064526D-01,
+c     .           beta_filt4  = 1.66967875150031D-01,
+c     .           a0_filt4    = 9.94229472548395D-01,
+c     .           a1_filt4    = 1.32582755203330D+00 / 2D0,
+c     .           a2_filt4    = 3.31711032666162D-01 / 2D0,
+c     .           a3_filt4    = 1.12953181261449D-04 / 2D0,
+c     .           a4_filt4    = 0D0)
+
+*
+* Eight order optimized filter (Ankit)
+*
+
+c      Parameter (alpha_filt4 =  6.371D-01,
+c     .           beta_filt4  =  1.469D-01,
+c     .           a0_filt4    =  9.9464D-01,
+c     .           a1_filt4    =  6.414D-01 ,
+c     .           a2_filt4    =  1.4476D-01,
+c     .           a3_filt4    =  6.127D-04,
+c     .           a4_filt4    = -7.6585D-05)
+
+*
+*  Cook and Cabot's Eighth order high wavenumber filter, JCP 2004
+*
+
+      Parameter (alpha_filt4 =  6.6624D-01,
+     .           beta_filt4  =  1.6688D-01,
+     .           a0_filt4    =  9.9965D-01,
+     .           a1_filt4    =  0.66652D+00 ,
+     .           a2_filt4    =  0.16674D+00,
+     .           a3_filt4    =  4.0D-05,
+     .           a4_filt4    = -5.0D-06)
+
+*
+* Visbal & Gaitonde near boundary filter
+*
+      Parameter (  bndy_alpha_filt  = 0.45D0,
+     .  bndy_a1_closure1_filt = 15D0/16D0,
+     .  bndy_a2_closure1_filt = 1D0/4D0,
+     .  bndy_a3_closure1_filt = -3D0/8D0,
+     .  bndy_a4_closure1_filt = 1D0/4D0,
+     .  bndy_a5_closure1_filt = -1D0/16D0,
+
+     .  bndy_a0_closure2_filt = ( 1D0/2D0   + bndy_alpha_filt ),
+     .  bndy_a1_closure2_filt = (1D0/16D0 + (7D0/8D0)*bndy_alpha_filt), 
+     .  bndy_a2_closure2_filt = (3D0/4D0  + (1D0/2D0)*bndy_alpha_filt),
+     .  bndy_a3_closure2_filt = (3D0/8D0  + (1D0/4D0)*bndy_alpha_filt),
+     .  bndy_a4_closure2_filt = (-1D0/4D0 + (1D0/2D0)*bndy_alpha_filt),
+     .  bndy_a5_closure2_filt = (1D0/16D0 - (1D0/8D0)*bndy_alpha_filt),
+
+     .  bndy_a0_closure3_filt = ( 5D0/8D0
+     .                        +   (3D0/4D0) * bndy_alpha_filt ),
+     .  bndy_a1_closure3_filt = ( 1D0/2D0   + bndy_alpha_filt )/2D0,
+     .  bndy_a2_closure3_filt = ( -1D0/8D0  + bndy_alpha_filt/4D0 )/2D0,
+
+     .  bndy_a0_closure4_filt = ( 11D0/16D0
+     .                        +   (5D0/8D0)   * alpha_filt4
+     .                        -   (5D0/8D0)   *  beta_filt4 ),
+     .  bndy_a1_closure4_filt = ( 15D0/32D0
+     .                        +   (17D0/16D0) * alpha_filt4
+     .                        +   (15D0/16D0) *  beta_filt4 )/2D0,
+     .  bndy_a2_closure4_filt = ( -3D0/16D0
+     .                        +    (3D0/8D0)  * alpha_filt4
+     .                        +    (13D0/8D0) *  beta_filt4 )/2D0,
+     .  bndy_a3_closure4_filt = ( 1D0/32D0
+     .                        - alpha_filt4/16D0 + beta_filt4/16D0)/2D0
+     .                                                                )
+
+*
+* Gaussian Filter of Cook and Cabot, JCP 2004
+*
+      Parameter (a0_filt_gauss = 3565D0/10368D0,
+     .           a1_filt_gauss = 3091D0/12960D0,
+     .           a2_filt_gauss = 1997D0/25920D0,
+     .           a3_filt_gauss = 149D0 /12960D0,
+     .           a4_filt_gauss = 107D0 /103680D0)
+   

@@ -1,0 +1,401 @@
+!  Mesh size
+      Integer Nx, Ny, Nz, Px, Py, Pz, Mx, My, Mz
+      Integer LotX, LotY, LotZ
+
+      Parameter (Nx = 256, Ny = 256, Nz = 256)
+      Parameter (Px = 16, Py = 16, Pz = 16)
+      Parameter (Mx = Nx/Px, My = Ny/Py, Mz = Nz/Pz )
+      Parameter (LotX = My*Mz)
+      Parameter (LotY = Mz*Mx)
+      Parameter (LotZ = Mx*My)
+
+! Length of domain for azimuthal averaging
+!      Parameter (N_avg = Nx/4) ! Periodic bc
+      Parameter (N_avg = Nx/2+10*(Nx/128)) ! Symmetry bc
+
+!  Probe measurement information
+
+!  Turbulence
+
+!  Max value: Nx_probe_turb = 15, 
+!             Ny_probe_turb =  8, 
+!             Nz_probe_turb =  5
+
+      Integer Nx_probe_turb, Ny_probe_turb, Nz_probe_turb
+
+      Parameter (Nx_probe_turb = 13, Ny_probe_turb = 7)
+      Parameter (Nz_probe_turb = 5)
+
+      Real*8  probe_x_turb(Nx_probe_turb), probe_y_turb(Ny_probe_turb)
+      Real*8  probe_z_turb(Nz_probe_turb)
+
+      Data probe_x_turb / 2.0D1,  2.5D1,  3.0D1,  3.5D1,  4.0D1,
+     .                    4.5D1,  5.0D1,  5.5D1,  6.0D1,  6.5D1,
+     .                    7.0D1,  7.5D1,  8.0D1/
+      Data probe_y_turb /-3.0D0, -2.0D0, -1.0D0,  0.0D0,  1.0D0,  
+     .                    2.0D0,  3.0D0/
+      Data probe_z_turb /-5.0D0, -2.0D0,  1.0D0,  4.0D0,  7.0D0/
+
+************************************************************************
+!  Filename
+      Character*20 vis_path, restart_path, stats_path, probe_path
+      Character*20 source_path, prefix
+
+      Common /fnames/ vis_path, restart_path, stats_path, probe_path, 
+     .                source_path, prefix
+
+!  Flow parameters
+      Real*8  Re, Re_inv, Re1, Re1_inv, Re2, Re2_inv, Pr, Pr_inv,  
+     .        Sc, Sc_inv, gamma, gamma1, gamma2, epsilon, 
+     .        vis_exp, bulk_ratio, T_ratio
+
+      Common  /Flow_Param/ Re, Re_inv, 
+     .         Re1, Re1_inv, Re2, Re2_inv, Pr, Pr_inv,
+     .         Sc, Sc_inv, gamma, gamma1, gamma2, epsilon,  
+     .         vis_exp, bulk_ratio, T_ratio
+
+! Other parameters
+      Integer hyper_param, part_param
+
+      Common /HYP/ hyper_param, part_param      
+
+!  Derivative (Calvin's 6th order optimized)
+!  First derivative for symmetry boundaries
+      Real*8  ldu_x_sym_A1(LotX,Mx), ldu_y_sym_A1(LotY,My),
+     .        ldu_z_sym_A1(LotZ,Mz)
+      Real*8  ldu_x_sym_B1(LotX,Mx), ldu_y_sym_B1(LotY,My),
+     .        ldu_z_sym_B1(LotZ,Mz)
+      Real*8  ldu_x_sym_C1(LotX,Mx), ldu_y_sym_C1(LotY,My),
+     .        ldu_z_sym_C1(LotZ,Mz)
+      Real*8  ldu_x_sym_D1(LotX,Mx), ldu_y_sym_D1(LotY,My),
+     .        ldu_z_sym_D1(LotZ,Mz)
+      Real*8  ldu_x_sym_E1(LotX,Mx), ldu_y_sym_E1(LotY,My), 
+     .        ldu_z_sym_E1(LotZ,Mz)
+      Real*8  ldu_x_asym_A1(LotX,Mx), ldu_y_asym_A1(LotY,My),
+     .        ldu_z_asym_A1(LotZ,Mz)
+      Real*8  ldu_x_asym_B1(LotX,Mx), ldu_y_asym_B1(LotY,My),
+     .        ldu_z_asym_B1(LotZ,Mz)
+      Real*8  ldu_x_asym_C1(LotX,Mx), ldu_y_asym_C1(LotY,My),
+     .        ldu_z_asym_C1(LotZ,Mz)
+      Real*8  ldu_x_asym_D1(LotX,Mx), ldu_y_asym_D1(LotY,My),
+     .        ldu_z_asym_D1(LotZ,Mz)
+      Real*8  ldu_x_asym_E1(LotX,Mx), ldu_y_asym_E1(LotY,My),
+     .        ldu_z_asym_E1(LotZ,Mz)
+
+!  Second derivative for symmetry boundaries
+      Real*8  ldu_x_sym_A2(LotX,Mx), ldu_y_sym_A2(LotY,My),
+     .        ldu_z_sym_A2(LotZ,Mz)
+      Real*8  ldu_x_sym_B2(LotX,Mx), ldu_y_sym_B2(LotY,My),
+     .        ldu_z_sym_B2(LotZ,Mz)
+      Real*8  ldu_x_sym_C2(LotX,Mx), ldu_y_sym_C2(LotY,My),
+     .        ldu_z_sym_C2(LotZ,Mz)
+      Real*8  ldu_x_sym_D2(LotX,Mx), ldu_y_sym_D2(LotY,My),
+     .        ldu_z_sym_D2(LotZ,Mz)
+      Real*8  ldu_x_sym_E2(LotX,Mx), ldu_y_sym_E2(LotY,My),
+     .        ldu_z_sym_E2(LotZ,Mz)
+      Real*8  ldu_x_asym_A2(LotX,Mx), ldu_y_asym_A2(LotY,My),
+     .        ldu_z_asym_A2(LotZ,Mz)
+      Real*8  ldu_x_asym_B2(LotX,Mx), ldu_y_asym_B2(LotY,My),
+     .        ldu_z_asym_B2(LotZ,Mz)
+      Real*8  ldu_x_asym_C2(LotX,Mx), ldu_y_asym_C2(LotY,My),
+     .        ldu_z_asym_C2(LotZ,Mz)
+      Real*8  ldu_x_asym_D2(LotX,Mx), ldu_y_asym_D2(LotY,My),
+     .        ldu_z_asym_D2(LotZ,Mz)
+      Real*8  ldu_x_asym_E2(LotX,Mx), ldu_y_asym_E2(LotY,My),
+     .        ldu_z_asym_E2(LotZ,Mz)
+ 
+      Common /DERS_S/ldu_x_sym_A1, ldu_y_sym_A1, ldu_z_sym_A1, 
+     .               ldu_x_sym_B1, ldu_y_sym_B1, ldu_z_sym_B1,
+     .               ldu_x_sym_C1, ldu_y_sym_C1, ldu_z_sym_C1,
+     .               ldu_x_sym_D1, ldu_y_sym_D1, ldu_z_sym_D1,
+     .               ldu_x_sym_E1, ldu_y_sym_E1, ldu_z_sym_E1,
+     .               ldu_x_asym_A1, ldu_y_asym_A1, ldu_z_asym_A1,
+     .               ldu_x_asym_B1, ldu_y_asym_B1, ldu_z_asym_B1,
+     .               ldu_x_asym_C1, ldu_y_asym_C1, ldu_z_asym_C1,
+     .               ldu_x_asym_D1, ldu_y_asym_D1, ldu_z_asym_D1,
+     .               ldu_x_asym_E1, ldu_y_asym_E1, ldu_z_asym_E1,
+     .               ldu_x_sym_A2, ldu_y_sym_A2, ldu_z_sym_A2,
+     .               ldu_x_sym_B2, ldu_y_sym_B2, ldu_z_sym_B2,
+     .               ldu_x_sym_C2, ldu_y_sym_C2, ldu_z_sym_C2,
+     .               ldu_x_sym_D2, ldu_y_sym_D2, ldu_z_sym_D2,
+     .               ldu_x_sym_E2, ldu_y_sym_E2, ldu_z_sym_E2,
+     .               ldu_x_asym_A2, ldu_y_asym_A2, ldu_z_asym_A2,
+     .               ldu_x_asym_B2, ldu_y_asym_B2, ldu_z_asym_B2,
+     .               ldu_x_asym_C2, ldu_y_asym_C2, ldu_z_asym_C2,
+     .               ldu_x_asym_D2, ldu_y_asym_D2, ldu_z_asym_D2,
+     .               ldu_x_asym_E2, ldu_y_asym_E2, ldu_z_asym_E2
+
+!  First derivative for regular boundaries
+      Real*8  ldu_x_A1(LotX,Mx), ldu_y_A1(LotY,My), ldu_z_A1(LotZ,Mz)
+      Real*8  ldu_x_B1(LotX,Mx), ldu_y_B1(LotY,My), ldu_z_B1(LotZ,Mz)
+      Real*8  ldu_x_C1(LotX,Mx), ldu_y_C1(LotY,My), ldu_z_C1(LotZ,Mz)
+      Real*8  ldu_x_D1(LotX,Mx), ldu_y_D1(LotY,My), ldu_z_D1(LotZ,Mz)
+      Real*8  ldu_x_E1(LotX,Mx), ldu_y_E1(LotY,My), ldu_z_E1(LotZ,Mz)
+!  Second derivative for regular boundaries
+      Real*8  ldu_x_A2(LotX,Mx), ldu_y_A2(LotY,My), ldu_z_A2(LotZ,Mz)
+      Real*8  ldu_x_B2(LotX,Mx), ldu_y_B2(LotY,My), ldu_z_B2(LotZ,Mz)
+      Real*8  ldu_x_C2(LotX,Mx), ldu_y_C2(LotY,My), ldu_z_C2(LotZ,Mz)
+      Real*8  ldu_x_D2(LotX,Mx), ldu_y_D2(LotY,My), ldu_z_D2(LotZ,Mz)
+      Real*8  ldu_x_E2(LotX,Mx), ldu_y_E2(LotY,My), ldu_z_E2(LotZ,Mz)
+
+      Common  /DERS/ ldu_x_A1, ldu_y_A1, ldu_z_A1,
+     .               ldu_x_B1, ldu_y_B1, ldu_z_B1,
+     .               ldu_x_C1, ldu_y_C1, ldu_z_C1,
+     .               ldu_x_D1, ldu_y_D1, ldu_z_D1,
+     .               ldu_x_E1, ldu_y_E1, ldu_z_E1,
+     .               ldu_x_A2, ldu_y_A2, ldu_z_A2,
+     .               ldu_x_B2, ldu_y_B2, ldu_z_B2,
+     .               ldu_x_C2, ldu_y_C2, ldu_z_C2,
+     .               ldu_x_D2, ldu_y_D2, ldu_z_D2,
+     .               ldu_x_E2, ldu_y_E2, ldu_z_E2
+
+      Real*8  alpha1_pade6, beta1_pade6, a1_pade6, b1_pade6, c1_pade6
+      Real*8  alpha2_pade6, beta2_pade6, a2_pade6, b2_pade6, c2_pade6
+      Real*8  d2_pade6
+
+!  Derivative (Calvin's optimized 6th order)
+
+!      Parameter (a1_pade6 = 1.367577724399269D0 / 2.0D0, 
+!     .           b1_pade6 = 8.234281701082790D-1 / 4.0D0, 
+!     .           c1_pade6 = 1.8520783486686603D-2 / 6.0D0, 
+!     .           alpha1_pade6 = 5.381301488732363D-1, 
+!     .           beta1_pade6  = 6.6633190123881123D-2)
+!      Parameter (a2_pade6 = 3.855624784762861D-1, 
+!     .           b2_pade6 = 1.486194872274852D0 / 4.0D0, 
+!     .           c2_pade6 = 9.3303618061543067D-2 / 9.0D0, 
+!     .           d2_pade6 = 2.0D0 * (a2_pade6 + b2_pade6 + c2_pade6), 
+!     .           alpha2_pade6 = 4.442052422604100D-1, 
+!     .           beta2_pade6  = 3.8325242145930416D-2)
+
+      Real*8  closure1, closure2, closure3
+      Real*8  closure4, closure5, closure6
+
+      Parameter (closure1 = 5.0D0 / 9.0D0, closure2 = 1.0D0 / 1.8D1)
+      Parameter (closure3 = 1.0D0 / 3.6D1, closure4 = 7.0D0 / 9.0D0)
+      Parameter (closure5 = 3.0D0 / 4.4D1, closure6 = 1.2D1 / 1.1D1)
+
+!  Derivative (Cook and Cabot's 10th order)
+
+c      Parameter (a1_pade6 = 1.416666666666666D0  / 2.0D0,
+c     .           b1_pade6 = 6.733333333333333D-1 / 4.0D0,
+c     .           c1_pade6 = 1.000000000000000D-2 / 6.0D0,
+c     .           alpha1_pade6 = 5.0000000000000000D-1,
+c     .           beta1_pade6  = 5.0000000000000000D-2)
+c      Parameter (a2_pade6 = 1065D0 / 1798D0,
+c     .           b2_pade6 = 1038D0/ (899D0 * 4.0D0),
+c     .           c2_pade6 = 79D0 / (1798D0 * 9.0D0),
+c     .           d2_pade6 = 2.0D0 * (a2_pade6 + b2_pade6 + c2_pade6),
+c     .           alpha2_pade6 = 334D0 / 899D0,
+c     .           beta2_pade6  = 43D0  / 1798D0)
+
+!  Derivative (FDL3DI - 6th order compact tridiagonal)
+
+      Parameter (a1_pade6 = 14.0D0 / 18.0D0,
+     .           b1_pade6 = 1.0D0 / 36.0D0,
+     .           c1_pade6 = 0.0D0,
+     .           alpha1_pade6 = 1.0D0 / 3.0D0,
+     .           beta1_pade6  = 0.0D0 )
+      Parameter (a2_pade6 = 12.0D0 / 11.0D0,
+     .           b2_pade6 = 3.0D0 / 44.0D0,
+     .           c2_pade6 = 2.0D0 * (a2_pade6 + b2_pade6),
+     .           d2_pade6 = 0.0D0,
+     .           alpha2_pade6 = 2.0D0 / 11.0D0,
+     .           beta2_pade6  = 0.0D0 )
+
+!  Grid generation
+      Integer Grid_X, Grid_Y, unif_x, unif_y
+      Real*8  xcor(Mx), ycor(My), zcor(Mz)
+      Real*8  gxcor(Nx), gycor(Ny), gzcor(Nz)
+      Real*8  sx(2), sy(2), sz(2)
+      Real*8  DX, DY, DZ
+      Real*8  x_leng, y_leng, z_leng
+      Real*8  period_x, period_y, period_z
+      Real*8  x_start, y_start, z_start
+ 
+      Common  /GRID/ xcor, ycor, zcor, 
+     .               gxcor, gycor, gzcor,
+     .               sx, sy, sz, 
+     .               DX, DY, DZ, 
+     .               x_leng, y_leng, z_leng,
+     .               Grid_X, Grid_Y, unif_x, unif_y,
+     .               period_x, period_y, period_z,
+     .               x_start, y_start, z_start
+
+! Monitoring/Tracking variables
+      Real*8  KE, MaxDil, Enstrophy, MomX, MomY, MomZ,
+     .        Mass_t,e_t, Entropy, Entropy2
+
+      Common /TRACK/ KE, MaxDil, Enstrophy, MomX, MomY, MomZ,
+     .               Mass_t, e_t, Entropy, Entropy2
+
+!  Time advancement
+      Integer march_mode, Nsteps
+      Real*8  kx_max, ky_max, kz_max, stab_limit
+      Real*8  kx_hug, ky_hug, kz_hug, resv_limit
+      Real*8  Tstep, cfl_cal, run_time, sim_start_time
+
+      Parameter (kx_max = 2.478D0, ky_max = 2.478D0, kz_max = 2.478D0)
+      Parameter (stab_limit = 2.85D0)
+      Parameter (kx_hug = 2.199D0, ky_hug = 2.199D0, kz_hug = 2.199D0)
+      Parameter (resv_limit = 2.0D0)
+
+      Common  /TIME_RK/ Tstep, cfl_cal, run_time, sim_start_time, 
+     .                  march_mode, Nsteps
+
+      Integer N_stage1_rk4, N_stage2_rk4
+
+      Parameter (N_stage1_rk4 = 5, N_stage2_rk4 = 6)
+
+      Real*8  alpha1_rk4(N_stage1_rk4), alpha2_rk4(N_stage2_rk4)
+      Real*8   beta1_rk4(N_stage1_rk4),  beta2_rk4(N_stage2_rk4)
+      Real*8      c1_rk4(N_stage1_rk4),     c2_rk4(N_stage2_rk4)
+
+!      Data alpha1_rk4 / 0.0D0, -6.0512264332862261228D-1, 
+!     .                 -2.04375640234761394333D0, 
+!     .                 -0.74069990637544192841D0, 
+!     .                 -4.42317651302968168941D0/
+!      Data beta1_rk4  / 2.6874543888713438496D-1, 
+!     .                  8.014706973220802933D-1, 
+!     .                  5.0515704269422722538D-1, 
+!     .                   5.6235680379000296407D-1, 
+!     .                  5.900655127758823335D-2/
+!      Data c1_rk4     / 0.0D0, 2.6874543888713438496D-1, 
+!     .                  5.8522806929524303469D-1, 
+!     .                  6.8270664478424678821D-1, 
+!     .                  1.1646854837729261436D0/
+!
+!      Data alpha2_rk4 / 0.0D0, -4.4127377153877382565D-1, 
+!     .                 -1.073982008079781868D0, 
+!     .                 -1.7063570791256758809D0, 
+!     .                 -2.7979293162682443056D0, 
+!     .                 -4.0913537120919160454D0/
+!      Data beta2_rk4  / 1.1584888181285561688D-1, 
+!     .                  3.7287699051652864918D-1, 
+!     .                  7.3795368921435295698D-1, 
+!     .                  5.7981109366311039538D-1, 
+!     .                  1.031284991300145194D0, 1.5D-1/
+!      Data c2_rk4     / 0.0D0, 1.1584888181285561688D-1, 
+!     .                  3.2418503640412806853D-1, 
+!     .                  6.1932082035177792368D-1, 
+!     .                  8.0344726663359079059D-1, 
+!     .                  9.1841664452065965078D-1/
+
+! Explicit RK4 (Cook and Cabot)
+      Data alpha1_rk4 / 0.0D0, -4.801594388477952D-01,
+     .                 -1.404247195200064D+00,
+     .                 -2.016477077503357D+00,
+     .                 -1.056444269767207D+00/
+      Data beta1_rk4  / 1.028639988104959D-01,
+     .                  7.408540575766301D-01,
+     .                  7.426530946683799D-01,
+     .                  4.694937902357905D-01,
+     .                  1.881733382887932D-01/
+      Data c1_rk4     / 0D0, 1.028639988104959D-01,
+     .                  4.879899878330192D-01,
+     .                  6.885177231562036D-01,
+     .                  9.023816453077341D-01/
+
+!  Flow statistics
+      Integer comp_stats 
+      Real*8  rho_rms, P_rms, T_rms, taylor_microscale
+      Real*8  Re_lambda, velocity_derivative_skewness
+      Real*8  dilatation_skewness, dilatation_flatness
+      Real*8  dilatation_square
+
+      Common /T_Stats1/ comp_stats
+      Common /T_Stats2/ rho_rms, P_rms, T_rms, taylor_microscale
+      Common /T_Stats3/ Re_lambda, velocity_derivative_skewness, 
+     .                  dilatation_skewness, dilatation_flatness,
+     .                  dilatation_square
+
+!  Flow statistics (spherical case)
+      Real*8  rho_shell_rms(N_avg), P_shell_rms(N_avg),
+     .        T_shell_rms(N_avg)
+      Real*8  velocity_derivative_shell_skewness(N_avg)
+      Real*8  dilatation_shell_skewness(N_avg), 
+     .        dilatation_shell_flatness(N_avg)
+      Real*8  dilatation_shell_square(N_avg)
+
+      Common /T_Stats2_sph/ rho_shell_rms, P_shell_rms, T_shell_rms
+      Common /T_Stats3_sph/ velocity_derivative_shell_skewness,
+     .                  dilatation_shell_skewness,
+     .                  dilatation_shell_flatness, 
+     .                  dilatation_shell_square
+
+!  Input/Output control
+      Integer out_incr_x, out_incr_y, out_incr_z
+      Integer out_grid, out_init, out_vis, out_probe, out_restart
+      Integer out_stats, out_source
+      Integer Nx_write, Ny_write, Nz_write
+
+      Common  /IO1/ out_incr_x, out_incr_y, out_incr_z, 
+     .              out_grid, out_init, out_vis, out_probe, 
+     .              out_restart, out_stats, out_source,
+     .              Nx_write, Ny_write, Nz_write
+
+      Integer in_unit, out_unit, tmp_unit
+      Integer grid_unit, spec_grid_unit
+      Integer q1_unit, q2_unit, spec_unit
+      Integer restart_unit, stats1_unit, stats3_unit
+      Integer stats2_unit
+
+      Parameter (in_unit      = 25, out_unit       = 26)
+      Parameter (grid_unit    = 11, spec_grid_unit = 12)
+      Parameter (q1_unit      = 21, q2_unit        = 22)
+      Parameter (restart_unit = 31, spec_unit      = 32)
+      Parameter (stats1_unit  = 33, stats3_unit    = 34)
+      Parameter (tmp_unit     = 10, stats2_unit    = 35)
+
+!  Probe measurements
+      Integer probe_x_index_turb(Nx_probe_turb)
+      Integer probe_y_index_turb(Ny_probe_turb)
+      Integer probe_z_index_turb(Nz_probe_turb)
+
+      Logical record_probe_turb 
+
+      Common  /Probe_Measure/ probe_x_index_turb,
+     .                        probe_y_index_turb,
+     .                        probe_z_index_turb, 
+     .                        record_probe_turb
+
+! For writing Visual and Restart files at specified times
+      Integer Nt_vis, Nt_restart
+      Parameter (Nt_vis = 4, Nt_restart = 4)
+
+      Real*8 t_vis(Nt_vis), t_restart(Nt_restart)
+      Integer cue_vis, cue_restart 
+
+      Common /VISUAL_OUT/ t_vis, t_restart 
+      Common /CUE/ cue_vis, cue_restart
+
+! Average hyperviscosities
+      Real*8 beta_avg, visc_avg, k_avg
+
+      Common /HYPER_AVG/ beta_avg, visc_avg, k_avg
+
+! MPI Stuff
+      Integer rank, xrank, yrank, zrank, mpi_size
+      Integer source_left_x, dest_left_x, source_right_x, dest_right_x
+      Integer source_left_y, dest_left_y, source_right_y, dest_right_y
+      Integer source_left_z, dest_left_z, source_right_z, dest_right_z
+      Integer MPI_XYZ_COMM, MPI_X_COMM, MPI_Y_COMM, MPI_Z_COMM
+
+      Common /MPI/ rank, xrank, yrank, zrank, mpi_size,
+     .         source_left_x, dest_left_x, source_right_x,
+     .         dest_right_x, source_left_y, dest_left_y,
+     .         source_right_y, dest_right_y, source_left_z,
+     .         dest_left_z, source_right_z, dest_right_z,
+     .         MPI_XYZ_COMM, MPI_X_COMM, MPI_Y_COMM,
+     .         MPI_Z_COMM
+
+!  Universal constants
+      Complex*16 eye
+      Real*8     Pi
+
+      Common  /U_const/ eye, Pi
+
+      Real*8       zero
+
+      Parameter (zero = 0.0)
+
+

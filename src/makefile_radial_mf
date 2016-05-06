@@ -1,0 +1,78 @@
+F77COMP     = mpixlf77
+F90COMP     = mpixlf90
+CCOMP       = mpicc
+LIB_LIST    = -L/home/ankitb/local/silo/lib -lsilo -lm
+NICE        =
+#OPTS        = -qarch=450 -g -qflttrap=invalid:nanq:zerodivide  
+OPTS        = -O5
+ARCH        =  
+INCLUDE     = -I/home/ankitb/local/silo/include
+
+OBJECTS1     = main_mf.o initialize_mpi_nonperiodic.o \
+               define_nonperiodic_mf.o grid.o \
+			   derivCDopt6_radial.o filters_nonperiodic.o \
+               lddrk4_nonperiodic_mf.o rhsv_radial_mf.o\
+               out_mf.o auxiliary_mf.o grad.o  \
+               hyper_radial_mf.o shock.o trace.o pproc_radial_mf.o\
+               tridiagonal.o pentadiagonal.o polydiagonal.o\
+
+cell_de_rad_mf: $(OBJECTS1)
+	$(F77COMP) -o cell_de_rad_mf $(ARCH) $(OBJECTS1) $(LIB_LIST) 
+
+main_mf.o:  header part_header main_mf.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) main_mf.f
+
+auxiliary_mf.o: header auxiliary_mf.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) auxiliary_mf.f
+
+define_nonperiodic_mf.o:  header define_nonperiodic_mf.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) define_nonperiodic_mf.f
+
+filters_nonperiodic.o: header LES_header filters_nonperiodic.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) filters_nonperiodic.f
+
+grid.o:  header grid.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) grid.f
+
+derivCDopt6_radial.o:  header derivCDopt6_radial.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) derivCDopt6_radial.f
+
+pproc_radial_mf.o: header pproc_radial_mf.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) pproc_radial_mf.f
+
+initialize_mpi_nonperiodic.o: header initialize_mpi_nonperiodic.f90
+	$(F90COMP) -c $(ARCH) $(NICE) $(OPTS) initialize_mpi_nonperiodic.f90
+
+pentadiagonal.o: pentadiagonal.f90
+	$(F90COMP) -c $(ARCH) $(NICE) $(OPTS) pentadiagonal.f90
+
+polydiagonal.o: polydiagonal.f90
+	$(F90COMP) -c $(ARCH) $(NICE) $(OPTS) polydiagonal.f90
+
+tridiagonal.o: tridiagonal.f90
+	$(F90COMP) -c $(ARCH) $(NICE) $(OPTS) tridiagonal.f90
+
+out_mf.o:  header part_header out_mf.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) out_mf.f
+
+grad.o:  header grad.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) grad.f
+
+hyper_radial_mf.o: header LES_header hyper_radial_mf.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) hyper_radial_mf.f
+
+lddrk4_nonperiodic_mf.o:  header part_header lddrk4_nonperiodic_mf.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) lddrk4_nonperiodic_mf.f
+
+rhsv_radial_mf.o:  header rhsv_radial_mf.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) rhsv_radial_mf.f
+
+shock.o: header shock.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) shock.f
+
+trace.o: header trace.f
+	$(F77COMP) -c $(ARCH) $(NICE) $(OPTS) trace.f
+
+#  remove object files
+clean:
+	rm -f *.o
