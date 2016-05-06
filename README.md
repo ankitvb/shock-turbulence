@@ -3,7 +3,7 @@ Source code to compute spherically expanding and converging shock waves through 
 This work was done by me as part of my Ph.D. at Stanford University. 
 
 <h2>Reference</h2>
-A. Bhagatwala <a href="https://books.google.com/books?id=RlBwQjTJkCMC&lpg=PR8&ots=qGd_JxnhgO&dq=info%3Aiea_iK9OsZgJ%3Ascholar.google.com&lr&pg=PR1#v=onepage&q&f=false"> Shock-turbulence Interaction and Richtmyer-Meshkov Instability in Spherical Geometry</a>, 2011, Stanford University
+A. Bhagatwala, <a href="https://books.google.com/books?id=RlBwQjTJkCMC&lpg=PR8&ots=qGd_JxnhgO&dq=info%3Aiea_iK9OsZgJ%3Ascholar.google.com&lr&pg=PR1#v=onepage&q&f=false"> Shock-turbulence Interaction and Richtmyer-Meshkov Instability in Spherical Geometry</a>, 2011, Stanford University
 
 <h2>Publications</h2>
 <ul>
